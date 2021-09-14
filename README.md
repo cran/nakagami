@@ -3,12 +3,8 @@
 
 # nakagami <img src="man/figures/logo.png" align="right" width="100" height="53.4" />
 
-[![Build
-Status](https://travis-ci.com/JonasMoss/nakagami.svg?branch=master)](https://travis-ci.com/JonasMoss/nakagami)
-[![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/JonasMoss/nakagami?branch=master&svg=true)](https://ci.appveyor.com/project/JonasMoss/nakagami)
-[![Coverage
-Status](https://codecov.io/gh/JonasMoss/nakagami/branch/master/graph/badge.svg)](https://codecov.io/gh/JonasMoss/nakagami?branch=master)
+[![R build
+status](https://github.com/JonasMoss/nakagami/workflows/R-CMD-check/badge.svg)](https://github.com/JonasMoss/nakagami/actions)
 [![Project Status: Active – The project has reached a stable, usable
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
@@ -60,12 +56,12 @@ The `rnaka` of `nakagami` is much faster than the `rnaka` of `VGAM`:
 microbenchmark::microbenchmark(nakagami::rnaka(100, 2, 4), 
                                VGAM::rnaka(100, 4, 2))
 #> Unit: microseconds
-#>                        expr    min      lq      mean median      uq
-#>  nakagami::rnaka(100, 2, 4)  265.9  303.45   553.702  352.6  430.25
-#>      VGAM::rnaka(100, 4, 2) 2028.3 2355.35 17558.350 2670.4 3040.85
-#>        max neval
-#>    15697.2   100
-#>  1480179.6   100
+#>                        expr    min     lq     mean  median     uq      max
+#>  nakagami::rnaka(100, 2, 4)  182.7  219.7 2374.957  302.05  428.3 154306.4
+#>      VGAM::rnaka(100, 4, 2) 1319.7 1670.6 9874.742 1901.20 2569.0 772334.0
+#>  neval
+#>    100
+#>    100
 ```
 
 And the quantile function of `nakagami` is slightly faster.
@@ -75,12 +71,9 @@ p = 1:10/11
 microbenchmark::microbenchmark(nakagami::qnaka(0.01, 10, 4), 
                                VGAM::qnaka(0.01, 4, 10))
 #> Unit: microseconds
-#>                          expr   min     lq     mean median     uq      max
-#>  nakagami::qnaka(0.01, 10, 4) 143.6 170.10 2117.254 201.65 293.25 183790.6
-#>      VGAM::qnaka(0.01, 4, 10) 345.9 389.55  565.839 464.65 585.10   2706.5
-#>  neval
-#>    100
-#>    100
+#>                          expr   min     lq    mean median     uq    max neval
+#>  nakagami::qnaka(0.01, 10, 4) 184.1 196.00 317.706 223.05 336.80 2665.5   100
+#>      VGAM::qnaka(0.01, 4, 10) 277.5 301.95 482.844 323.00 520.75 2979.1   100
 ```
 
 Moreover, `VGAM::qnaka` fails to implement the standard argument `log.p`

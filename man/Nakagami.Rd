@@ -19,7 +19,7 @@ rnaka(n, shape, scale)
 \arguments{
 \item{x, q}{vector of quantiles.}
 
-\item{shape}{vector of shape parameters greater than \code{1/2}.}
+\item{shape}{vector of positive shape parameters.}
 
 \item{scale}{vector of positive scale parameters.}
 
@@ -48,19 +48,28 @@ Density, distribution function, quantile function and random generation for
 the Nakagami distribution with parameters \code{shape} and \code{scale}.
 }
 \details{
-The Nakagami distribution with shape \eqn{m} and scale \eqn{\Omega} has
-density \deqn{2m^m/{\Gamma(m)\Omega^m} x^(2m-1)e^(-m/\Omega x^2)} for
-\eqn{x \ge 0}, \eqn{m \ge 1/2} and \eqn{\Omega > 0}.
+The Nakagami distribution (Nakagami, 1960) with shape \eqn{m} and scale
+\eqn{\Omega} has density
+\deqn{2m^m/{\Gamma(m)\Omega^m} x^(2m-1)e^(-m/\Omega x^2)} for
+\eqn{x \ge 0}, \eqn{m > 0} and \eqn{\Omega > 0}.
 
 If \eqn{Y} is \link[stats:GammaDist]{Gamma} distributed with \eqn{shape = m} and
 \eqn{rate = m/\Omega} then \eqn{X = \sqrt Y} is Nakagami distributed
 with \eqn{shape = m} and \eqn{scale = \Omega}.
+
+Sometimes, specifically in radio channels modeling, the parameter \eqn{m} is
+constrained to \eqn{m \ge 1/2}, but the density is defined for any
+\eqn{m > 0} (Kolar et al., 2004).
 }
 \references{
 Nakagami, N. 1960. "The M-Distribution, a General Formula of
 Intensity of Rapid Fading." In Statistical Methods in Radio Wave
 Propagation: Proceedings of a Symposium Held at the University of
 California, edited by William C. Hoffman, 3-36. Permagon Press.
+
+Kolar, R., Jirik, R., & Jan, J. (2004).
+Estimator comparison of the Nakagami-m parameter and its
+application in echocardiography. Radioengineering, 13(1), 8-12.
 }
 \seealso{
 The \link[stats:GammaDist]{Gamma} distribution is closed related to the

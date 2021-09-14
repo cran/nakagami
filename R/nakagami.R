@@ -3,13 +3,18 @@
 #' Density, distribution function, quantile function and random generation for
 #'    the Nakagami distribution with parameters `shape` and `scale`.
 #'
-#' The Nakagami distribution with shape \eqn{m} and scale \eqn{\Omega} has
-#'    density \deqn{2m^m/{\Gamma(m)\Omega^m} x^(2m-1)e^(-m/\Omega x^2)} for
-#'    \eqn{x \ge 0}, \eqn{m \ge 1/2} and \eqn{\Omega > 0}.
+#' The Nakagami distribution (Nakagami, 1960) with shape \eqn{m} and scale
+#'    \eqn{\Omega} has density
+#'    \deqn{2m^m/{\Gamma(m)\Omega^m} x^(2m-1)e^(-m/\Omega x^2)} for
+#'    \eqn{x \ge 0}, \eqn{m > 0} and \eqn{\Omega > 0}.
 #'
 #' If \eqn{Y} is [Gamma][stats::GammaDist] distributed with \eqn{shape = m} and
 #'    \eqn{rate = m/\Omega} then \eqn{X = \sqrt Y} is Nakagami distributed
 #'    with \eqn{shape = m} and \eqn{scale = \Omega}.
+#'
+#' Sometimes, specifically in radio channels modeling, the parameter \eqn{m} is
+#'    constrained to \eqn{m \ge 1/2}, but the density is defined for any
+#'    \eqn{m > 0} (Kolar et al., 2004).
 #'
 #' @export
 #' @name Nakagami
@@ -17,7 +22,7 @@
 #' @param p vector of probabilities.
 #' @param n number of observations. If `length(n) > 1`, the length is taken to
 #'     be the number required.
-#' @param shape vector of shape parameters greater than `1/2`.
+#' @param shape vector of positive shape parameters.
 #' @param scale vector of positive scale parameters.
 #' @param log,log.p logical; if `TRUE`, probabilities `p` are given as `log(p)`.
 #' @param lower.tail logical; if `TRUE` (default), probabilities are
@@ -35,6 +40,10 @@
 #'    Intensity of Rapid Fading." In Statistical Methods in Radio Wave
 #'    Propagation: Proceedings of a Symposium Held at the University of
 #'    California, edited by William C. Hoffman, 3-36. Permagon Press.
+#'
+#' Kolar, R., Jirik, R., & Jan, J. (2004).
+#'    Estimator comparison of the Nakagami-m parameter and its
+#'    application in echocardiography. Radioengineering, 13(1), 8-12.
 #'
 #' @seealso The [Gamma][stats::GammaDist] distribution is closed related to the
 #'    Nakgami distribution.

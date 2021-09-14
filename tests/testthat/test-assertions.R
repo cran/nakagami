@@ -7,7 +7,7 @@ test_that("is_naka_parameters works", {
   expect_false(is_naka_parameters(lm, list()))
   expect_false(is_naka_parameters(-1, 1))
   expect_false(is_naka_parameters(1.1, -1.1))
-  expect_false(is_naka_parameters(c(3, 1 / 3, 3), c(4, 1, 5)))
+  expect_false(is_naka_parameters(c(3, 0, 3), c(4, 1, 5)))
 })
 
 test_that("is_positive_integer works", {
