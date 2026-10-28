@@ -1,7 +1,7 @@
 Package: nakagami
 Type: Package
 Title: Functions for the Nakagami Distribution
-Version: 1.1.0
+Version: 1.2.0
 Authors@R: c(
     person("Jonas", "Moss", , "jonas.gjertsen@gmail.com", 
       role = c("aut", "cre"), 
@@ -12,14 +12,13 @@ Description: Density, distribution function, quantile function and random
     <doi:10.1016/B978-0-08-009306-2.50005-4>.
 License: MIT + file LICENSE
 Encoding: UTF-8
-Imports: assertthat
-Suggests: testthat, knitr, covr, rmarkdown
-RoxygenNote: 7.1.1
+Suggests: testthat, knitr, rmarkdown
 URL: https://github.com/JonasMoss/nakagami
 BugReports: https://github.com/JonasMoss/nakagami/issues
+Config/roxygen2/version: 8.0.0
 NeedsCompilation: no
-Packaged: 2021-09-14 07:55:53 UTC; A2010578
-Author: Jonas Moss [aut, cre] (<https://orcid.org/0000-0002-6876-6964>)
+Packaged: 2026-10-28 18:11:44 UTC; jonas
+Author: Jonas Moss [aut, cre] (ORCID: <https://orcid.org/0000-0002-6876-6964>)
 Maintainer: Jonas Moss <jonas.gjertsen@gmail.com>
 Repository: CRAN
-Date/Publication: 2021-09-14 08:10:02 UTC
+Date/Publication: 2026-10-28 20:10:02 UTC

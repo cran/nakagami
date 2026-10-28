@@ -209,7 +209,7 @@ test_that("rnaka: length(n) works", {
   expect_equal(lhs, rhs)
 })
 
-test_that("qnaka: Recycling works", {
+test_that("rnaka: Recycling works", {
   lhs <- length(rnaka(10, shape = shapes, scale = scales))
   rhs <- 10
   expect_equal(lhs, rhs)

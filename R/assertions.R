@@ -1,33 +1,26 @@
 is_naka_parameters <- function(shape, scale) {
-  if (!is.numeric(shape) | !is.numeric(scale)) {
-    return(FALSE)
-  }
-  if (any(shape <= 0)) {
-    return(FALSE)
-  }
-  if (any(scale <= 0)) {
-    return(FALSE)
-  }
-  TRUE
+  is.numeric(shape) && is.numeric(scale) &&
+    all(is.finite(shape) & shape > 0) &&
+    all(is.finite(scale) & scale > 0)
 }
 
-attr(is_naka_parameters, "fail") <- function(call, env) {
-  paste0("shape and scale are not valid parameter vectors")
-}
-
-is_positive_integer <- function(x) {
-  if (!assertthat::is.count(x)) {
-    return(FALSE)
+check_naka_parameters <- function(shape, scale) {
+  if (!is_naka_parameters(shape, scale)) {
+    stop("shape and scale are not valid parameter vectors", call. = FALSE)
   }
-  x > 0
 }
 
-attr(is_positive_integer, "fail") <- function(call, env) {
-  paste0(deparse(call$x), " is not a positive integer")
+is_nonnegative_integer <- function(x) {
+  is.numeric(x) && length(x) == 1L && is.finite(x) &&
+    x >= 0 && x == floor(x)
 }
 
-is_logical_scalar <- function(x) length(x) == 1L & is.logical(x)
+is_logical_scalar <- function(x) {
+  is.logical(x) && length(x) == 1L && !is.na(x)
+}
 
-attr(is_logical_scalar, "fail") <- function(call, env) {
-  paste0(deparse(call$x), " is not a logical scalar")
+check_logical_scalar <- function(x, name) {
+  if (!is_logical_scalar(x)) {
+    stop(paste(name, "is not a logical scalar"), call. = FALSE)
+  }
 }

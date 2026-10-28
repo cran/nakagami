@@ -20,11 +20,12 @@
 #' @name Nakagami
 #' @param x,q vector of quantiles.
 #' @param p vector of probabilities.
-#' @param n number of observations. If `length(n) > 1`, the length is taken to
-#'     be the number required.
-#' @param shape vector of positive shape parameters.
-#' @param scale vector of positive scale parameters.
-#' @param log,log.p logical; if `TRUE`, probabilities `p` are given as `log(p)`.
+#' @param n non-negative integer number of observations. If `length(n) > 1`,
+#'     the length is taken to be the number required.
+#' @param shape vector of positive, finite shape parameters.
+#' @param scale vector of positive, finite scale parameters.
+#' @param log logical; if `TRUE`, the density is returned on the log scale.
+#' @param log.p logical; if `TRUE`, probabilities are given on the log scale.
 #' @param lower.tail logical; if `TRUE` (default), probabilities are
 #'    \eqn{P[X \le x]} otherwise, \eqn{P[X > x]}.
 #' @return `dnaka` gives the density, `pnaka` gives the distribution function,
@@ -34,7 +35,8 @@
 #'    maximum of the lengths of the numerical arguments for the other functions.
 #'
 #'    The numerical arguments other than `n` are recycled to the length of the
-#'    result.
+#'    result. A zero-length numerical argument gives a zero-length result for
+#'    `dnaka`, `pnaka` and `qnaka`.
 #'
 #' @references Nakagami, N. 1960. "The M-Distribution, a General Formula of
 #'    Intensity of Rapid Fading." In Statistical Methods in Radio Wave
@@ -45,88 +47,110 @@
 #'    Estimator comparison of the Nakagami-m parameter and its
 #'    application in echocardiography. Radioengineering, 13(1), 8-12.
 #'
-#' @seealso The [Gamma][stats::GammaDist] distribution is closed related to the
-#'    Nakgami distribution.
+#' @seealso The [Gamma][stats::GammaDist] distribution is closely related to the
+#'    Nakagami distribution.
 
 dnaka <- function(x, shape, scale, log = FALSE) {
-  assertthat::assert_that(is_logical_scalar(log))
-  assertthat::assert_that(is_naka_parameters(shape, scale))
+  check_logical_scalar(log, "log")
+  args <- recycle_naka(x, shape, scale)
+  x <- args$x
+  shape <- args$shape
+  scale <- args$scale
 
-  rate <- suppress_olw(shape / scale)
+  # Work with a unit-rate Gamma variable to avoid squaring x or forming
+  # shape / scale before rescaling. Evaluate the Jacobian on the log scale.
+  out <- rep(-Inf, length(x))
+  out[is.na(x)] <- x[is.na(x)]
+  positive <- which(x > 0 & is.finite(x))
+  log_x <- log(x[positive])
+  gamma_arg <- naka_gamma_argument(x[positive], shape[positive], scale[positive])
+  log_y <- gamma_arg$log_y
+  y <- gamma_arg$y
+  out[positive] <- log(2) + log_y - log_x +
+    stats::dgamma(y, shape = shape[positive], log = TRUE)
 
-  if (!log) {
-    suppress_olw(2 * x * stats::dgamma(
-      x = x^2,
-      shape = shape,
-      rate = rate,
-      log = FALSE
-    ))
-  } else {
-    suppress_olw(log(x) + log(2) + stats::dgamma(
-      x = x^2,
-      shape = shape,
-      rate = rate,
-      log = TRUE
-    ))
-  }
+  # If y underflows, the small-y Gamma density still has a finite log.
+  small <- which(y == 0)
+  out[positive[small]] <- log(2) - log_x[small] +
+    shape[positive[small]] * log_y[small] - lgamma(shape[positive[small]])
+  out[positive[is.infinite(y)]] <- -Inf
+
+  zero <- which(x == 0)
+  out[zero[shape[zero] < 0.5]] <- Inf
+  half <- zero[shape[zero] == 0.5]
+  out[half] <- (log(2) - log(pi) - log(scale[half])) / 2
+
+  if (log) out else exp(out)
 }
 
 #' @rdname Nakagami
 #' @export
 pnaka <- function(q, shape, scale, lower.tail = TRUE, log.p = FALSE) {
-  assertthat::assert_that(is_naka_parameters(shape, scale))
-  assertthat::assert_that(is_logical_scalar(log.p))
-  assertthat::assert_that(is_logical_scalar(lower.tail))
-  rate <- suppress_olw(shape / scale)
+  check_logical_scalar(log.p, "log.p")
+  check_logical_scalar(lower.tail, "lower.tail")
+  args <- recycle_naka(q, shape, scale)
 
-  stats::pgamma(
-    q = q^2,
-    shape = shape,
-    rate = rate,
-    lower.tail = lower.tail,
-    log.p = log.p
-  )
+  gamma_arg <- naka_gamma_argument(pmax(args$x, 0), args$shape, args$scale)
+  log_y <- gamma_arg$log_y
+  y <- gamma_arg$y
+  out <- stats::pgamma(y, shape = args$shape,
+                       lower.tail = lower.tail, log.p = log.p)
+
+  # Retain representable Nakagami probabilities when the squared variable
+  # is subnormal or underflows. The omitted Gamma-series terms are O(y).
+  small <- which(y < .Machine$double.xmin)
+  log_p <- args$shape[small] * log_y[small] - naka_lgamma1p(args$shape[small])
+  out[small] <- if (lower.tail) {
+    if (log.p) log_p else exp(log_p)
+  } else {
+    if (log.p) {
+      ifelse(log_p < -log(2), log1p(-exp(log_p)), log(-expm1(log_p)))
+    } else {
+      -expm1(log_p)
+    }
+  }
+  out
 }
 
 #' @rdname Nakagami
 #' @export
 qnaka <- function(p, shape, scale, lower.tail = TRUE, log.p = FALSE) {
-  assertthat::assert_that(is_naka_parameters(shape, scale))
-  assertthat::assert_that(is_logical_scalar(log.p))
-  assertthat::assert_that(is_logical_scalar(lower.tail))
-  rate <- suppress_olw(shape / scale)
+  check_logical_scalar(log.p, "log.p")
+  check_logical_scalar(lower.tail, "lower.tail")
+  args <- recycle_naka(p, shape, scale)
+  y <- stats::qgamma(args$x, shape = args$shape,
+                     lower.tail = lower.tail, log.p = log.p)
+  out <- sqrt(y) / sqrt(args$shape) * sqrt(args$scale)
 
-  if (!log.p) {
-    stats::qgamma(
-      p = p,
-      shape = shape,
-      rate = rate,
-      lower.tail = lower.tail
-    ) ^ (1 / 2)
-  } else {
-    stats::qgamma(
-      p = p,
-      shape = shape,
-      rate = rate,
-      lower.tail = lower.tail,
-      log.p = TRUE
-    ) ^ (1 / 2)
+  # A Gamma quantile can underflow although its square root is representable.
+  # For subnormal y, F(y) = y^shape / Gamma(shape + 1) to working precision.
+  small <- which(y < .Machine$double.xmin)
+  if (length(small)) {
+    p <- args$x[small]
+    log_p <- if (log.p) {
+      if (lower.tail) p else log(-expm1(p))
+    } else {
+      if (lower.tail) log(p) else log1p(-p)
+    }
+    interior <- is.finite(log_p)
+    small <- small[interior]
+    log_p <- log_p[interior]
+    out[small] <- exp((log_p + naka_lgamma1p(args$shape[small])) /
+      args$shape[small] / 2 +
+      (log(args$scale[small]) - log(args$shape[small])) / 2)
   }
+  out
 }
 
 #' @rdname Nakagami
 #' @export
 rnaka <- function(n, shape, scale) {
-  if (length(n) > 1) n <- length(n)
-
-  assertthat::assert_that(is_naka_parameters(shape, scale))
-  assertthat::assert_that(is_positive_integer(n))
-
-  rate <- suppress_olw(shape / scale)
-
-  sqrt(stats::rgamma(
-    n = n,
-    shape = shape,
-    rate = rate
-  ))
+  if (length(n) != 1L) n <- length(n)
+  check_naka_parameters(shape, scale)
+  if (!is_nonnegative_integer(n)) {
+    stop("n is not a non-negative integer", call. = FALSE)
+  }
+  shape <- rep_len(shape, n)
+  scale <- rep_len(scale, n)
+  sqrt(stats::rgamma(n = n, shape = shape)) / sqrt(shape) * sqrt(scale)
 }

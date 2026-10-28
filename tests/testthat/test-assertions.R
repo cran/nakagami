@@ -10,15 +10,15 @@ test_that("is_naka_parameters works", {
   expect_false(is_naka_parameters(c(3, 0, 3), c(4, 1, 5)))
 })
 
-test_that("is_positive_integer works", {
-  expect_false(is_positive_integer(-1))
-  expect_false(is_positive_integer(0))
-  expect_false(is_positive_integer(17.1))
-  expect_false(is_positive_integer(c(1, 2, 3)))
-  expect_false(is_positive_integer("haha"))
-  expect_false(is_positive_integer(lm))
-  expect_true(is_positive_integer(1))
-  expect_true(is_positive_integer(10))
+test_that("is_nonnegative_integer works", {
+  expect_false(is_nonnegative_integer(-1))
+  expect_true(is_nonnegative_integer(0))
+  expect_false(is_nonnegative_integer(17.1))
+  expect_false(is_nonnegative_integer(c(1, 2, 3)))
+  expect_false(is_nonnegative_integer("haha"))
+  expect_false(is_nonnegative_integer(lm))
+  expect_true(is_nonnegative_integer(1))
+  expect_true(is_nonnegative_integer(10))
 })
 
 test_that("is_logical_scalar works", {

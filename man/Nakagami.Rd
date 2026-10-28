@@ -19,19 +19,21 @@ rnaka(n, shape, scale)
 \arguments{
 \item{x, q}{vector of quantiles.}
 
-\item{shape}{vector of positive shape parameters.}
+\item{shape}{vector of positive, finite shape parameters.}
 
-\item{scale}{vector of positive scale parameters.}
+\item{scale}{vector of positive, finite scale parameters.}
 
-\item{log, log.p}{logical; if \code{TRUE}, probabilities \code{p} are given as \code{log(p)}.}
+\item{log}{logical; if \code{TRUE}, the density is returned on the log scale.}
 
 \item{lower.tail}{logical; if \code{TRUE} (default), probabilities are
 \eqn{P[X \le x]} otherwise, \eqn{P[X > x]}.}
 
+\item{log.p}{logical; if \code{TRUE}, probabilities are given on the log scale.}
+
 \item{p}{vector of probabilities.}
 
-\item{n}{number of observations. If \code{length(n) > 1}, the length is taken to
-be the number required.}
+\item{n}{non-negative integer number of observations. If \code{length(n) > 1},
+the length is taken to be the number required.}
 }
 \value{
 \code{dnaka} gives the density, \code{pnaka} gives the distribution function,
@@ -41,7 +43,8 @@ The length of the result is determined by \code{n} for \code{rnaka}, and is the
 maximum of the lengths of the numerical arguments for the other functions.
 
 The numerical arguments other than \code{n} are recycled to the length of the
-result.
+result. A zero-length numerical argument gives a zero-length result for
+\code{dnaka}, \code{pnaka} and \code{qnaka}.
 }
 \description{
 Density, distribution function, quantile function and random generation for
@@ -72,6 +75,6 @@ Estimator comparison of the Nakagami-m parameter and its
 application in echocardiography. Radioengineering, 13(1), 8-12.
 }
 \seealso{
-The \link[stats:GammaDist]{Gamma} distribution is closed related to the
-Nakgami distribution.
+The \link[stats:GammaDist]{Gamma} distribution is closely related to the
+Nakagami distribution.
 }
